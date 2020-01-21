@@ -1,0 +1,28 @@
+Timer unit: 1e-06 s
+
+Total time: 249.16 s
+File: <ipython-input-2-cabae119e9b9>
+Function: sentence_tokenize at line 11
+
+Line #      Hits         Time  Per Hit   % Time  Line Contents
+==============================================================
+    11                                           def sentence_tokenize(text):
+    12     15000  247254401.0  16483.6     99.2   doc = nlp(text)
+    13     15000    1905191.0    127.0      0.8   return [sent.string.strip() for sent in doc.sents]
+
+Total time: 249.545 s
+File: <ipython-input-2-cabae119e9b9>
+Function: run_spacy at line 48
+
+Line #      Hits         Time  Per Hit   % Time  Line Contents
+==============================================================
+    48                                           def run_spacy(): 
+    49         1       1093.0   1093.0      0.0      with open('reddit-comments-2015-08.csv', 'r') as f:
+    50         1          8.0      8.0      0.0          reader = csv.reader(f, skipinitialspace=True)
+    51                                                   # read is an iterator which contains lines which can be itered through an iterator.
+    52         1        185.0    185.0      0.0          next(reader)   
+    53                                               # iterate through all the lines and tokenize the text.
+    54     15001     188691.0     12.6      0.1          for row in reader:
+    55     15000      12894.0      0.9      0.0              sample_str=row[0]
+    56     15000  249295997.0  16619.7     99.9              tokzd = sentence_tokenize(sample_str.lower())
+    57     15000      45955.0      3.1      0.0              sentences = itertools.chain(tokzd)

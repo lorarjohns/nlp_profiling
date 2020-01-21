@@ -1,0 +1,91 @@
+Timer unit: 1e-06 s
+
+Total time: 59.6047 s
+File: <ipython-input-28-fc55812edfa8>
+Function: get_piped_docs at line 1
+
+Line #      Hits         Time  Per Hit   % Time  Line Contents
+==============================================================
+     1                                           def get_piped_docs(docs):
+     2         1          4.0      4.0      0.0      my_docs = []
+     3       162   59604517.0 367929.1    100.0      for doc in pipe_docs(prof_docs):
+     4       161        199.0      1.2      0.0          my_docs.append(doc)
+     5         1          2.0      2.0      0.0      return my_docs
+
+Total time: 6.94714 s
+File: <ipython-input-34-efafc0d6f2b1>
+Function: clean_text at line 1
+
+Line #      Hits         Time  Per Hit   % Time  Line Contents
+==============================================================
+     1                                           def clean_text(doc, spacy=True, printed=False, list_tokens=False):
+     2                                               '''
+     3                                               define a simple preprocessing pipeline for general NLP tasks.
+     4                                               non-spaCy version:
+     5                                                 - tokenize: split texts into individual tokens
+     6                                                 - lowercase: normalize the vocabulary by case
+     7                                                 - stopword removal: remove tokens if they appear in a specified list
+     8                                                 - tag: tag part of speech (for lemmatization)
+     9                                                 - lemmatize: normalize the vocabulary to the base form of each token
+    10                                                 - join (optional): return the list of tokens in one joined string
+    11                                                 
+    12                                                 the spaCy pipeline includes all of this, plus dependency parsing and NER:
+    13                                                 
+    14                                               spaCy version:
+    15                                                 - tokenize
+    16                                                 - tag: tag part of speech
+    17                                                 - parse: perform dependency parsing
+    18                                                 - named entity recognition: extract named entities according to statistical model
+    19                                                 - lemmatize
+    20                                                 - join (optional)
+    21                                               '''  
+    22                                           
+    23       161        237.0      1.5      0.0      if spacy:
+    24       161    1520788.0   9445.9     21.9          doc = [token.lemma_ for token in doc if not token.is_stop and not token.pos_ in ['PRON', 'PUNCT']]
+    25                                                   #dropwhile(lambda x: not (x.is_stop and x.pos_ in ['PRON', 'PUNCT']), tokens)
+    26                                                   #if not token.is_stop and not token.pos_ in set(['PRON', 'PUNCT'])
+    27       161        417.0      2.6      0.0          if not list_tokens:
+    28       161    5425701.0  33700.0     78.1              return nlp.make_doc(' '.join([token for token in doc]))
+    29                                                   else:
+    30                                                       return doc
+    31                                               else:
+    32                                                   '''
+    33                                                   spaCy's default pipeline includes tokenizer + lemmatizer + POS-tagging
+    34                                                   we've added stopword removal to both processes
+    35                                                   '''
+    36                                                   def pos_tag_nltk(token, printed=False):
+    37                                                       tag_map = defaultdict(lambda : wn.NOUN)
+    38                                                       tag_map['J'] = wn.ADJ
+    39                                                       tag_map['V'] = wn.VERB
+    40                                                       tag_map['R'] = wn.ADV
+    41                                                   
+    42                                                       nonlocal lemmatizer
+    43                                                   
+    44                                                       token, tag = zip(*pos_tag([token]))
+    45                                                       lemma = lemmatizer.lemmatize(token[0], tag_map[tag[0][0]])
+    46                                                       if printed:
+    47                                                           print(token[0], "=>", lemma)
+    48                                                       return lemma
+    49                                           
+    50                                                   new_doc = []
+    51                                                   tokenizer = RegexpTokenizer(r'\w+')
+    52                                                   lemmatizer = WordNetLemmatizer()
+    53                                                   doc = tokenizer.tokenize(doc)
+    54                                                   for token in doc:
+    55                                                       if token.lower() not in stop_words:
+    56                                                           new_doc.append(pos_tag_nltk(token.lower(), printed))
+    57                                                   if not list_tokens:
+    58                                                       return ' '.join([token for token in new_doc])
+    59                                                   else:
+    60                                                       return new_doc
+
+Total time: 59.6032 s
+File: <ipython-input-35-ce50ecdc3277>
+Function: pipe_docs at line 5
+
+Line #      Hits         Time  Per Hit   % Time  Line Contents
+==============================================================
+     5                                           def pipe_docs(docs):
+     6       162   59602942.0 367919.4    100.0      for doc in nlp_pipeline.pipe(docs, disable=['parser', 'ner']):
+     7                                                   # _ = doc.text
+     8       161        252.0      1.6      0.0          yield doc
